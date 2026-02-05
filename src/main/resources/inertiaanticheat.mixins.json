@@ -10,6 +10,7 @@
     "requireAnnotations": true
   },
   "server": [
+    "server.ServerCommonNetworkHandlerMixin",
     "server.ServerLoginNetworkHandlerMixin",
     "server.ServerQueryNetworkHandlerMixin"
   ],

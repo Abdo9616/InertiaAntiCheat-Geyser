@@ -70,8 +70,8 @@ whitelist = ["Whitelisted mods: ", "None"]
 hash = ["Requires modpack: ", "Modpack Name"]
 
 [geyser]
-# Whether to allow Geyser clients (Bedrock players) to join the server.
-allow_geyser_clients = false
+# Whether to allow Geyser clients (Bedrock players) to join the server. (Floodgate is required)
+allow_geyser_clients = false (Warning: Extra security risk, use at your own risk)
 
 [debug]
 # Show additional information in server logs.

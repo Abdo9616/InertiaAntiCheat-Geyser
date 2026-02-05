@@ -38,6 +38,7 @@ public class ServerLoginModlistTransferHandler {
 
     public static void init() {
         ServerLoginConnectionEvents.QUERY_START.register(ServerLoginModlistTransferHandler::initiateConnection);
+        GeyserBypassTracker.register();
     }
 
     /**
@@ -76,17 +77,32 @@ public class ServerLoginModlistTransferHandler {
                     ServerLoginNetworking.LoginSynchronizer synchronizer, PacketSender packetSender) {
         LoginPacketSender sender = (LoginPacketSender) packetSender;
 
+        boolean allowGeyserClients = InertiaAntiCheatServer.serverConfig.getBoolean("geyser.allow_geyser_clients", false);
+        UpgradedServerLoginNetworkHandler upgradedHandler = (UpgradedServerLoginNetworkHandler) handler;
+        net.minecraft.network.ClientConnection connection = upgradedHandler.inertiaAntiCheat$getConnection();
+        FloodgateBridge floodgateBridge = FloodgateBridge.get();
+        com.mojang.authlib.GameProfile profile = upgradedHandler.inertiaAntiCheat$getGameProfile();
+        java.util.UUID profileId = extractProfileId(profile);
+        boolean isFloodgate = allowGeyserClients
+                && floodgateBridge.isFloodgatePlayer(profileId);
+        if (isFloodgate) {
+            debugInfo(handler.getConnectionInfo() + " is a Geyser client and is allowed");
+            this.loginBlocker.complete(null);
+            debugLine();
+            return;
+        }
+
         if (!b) {
-            // Client doesn't respond to mod messages (likely Geyser/vanilla client)
-            boolean allowGeyserClients = InertiaAntiCheatServer.serverConfig.getBoolean("geyser.allow_geyser_clients", false);
-            
+            // Client doesn't respond to mod messages (likely vanilla client)
             if (allowGeyserClients) {
-                debugInfo(handler.getConnectionInfo() + " does not respond to mod messages, but Geyser clients are allowed");
-                this.loginBlocker.complete(null);
-                debugLine();
-                return;
+                if (GeyserBypassTracker.markPending(connection)) {
+                    debugInfo(handler.getConnectionInfo() + " does not respond to mod messages, deferring Geyser check until play stage");
+                    this.loginBlocker.complete(null);
+                    debugLine();
+                    return;
+                }
+                debugInfo(handler.getConnectionInfo() + " does not respond to mod messages and could not be tracked for Geyser validation");
             }
-            
             debugInfo(handler.getConnectionInfo() + " does not respond to mod messages, kicking now");
             handler.disconnect(Text.of(InertiaAntiCheatServer.serverConfig.getString("validation.vanillaKickMessage")));
             return;
@@ -187,4 +203,39 @@ public class ServerLoginModlistTransferHandler {
         validatorAdaptor.future.whenComplete((ignored1, ignored2) -> this.loginBlocker.complete(null));
         debugLine();
     }
+
+    private java.util.UUID extractProfileId(com.mojang.authlib.GameProfile profile) {
+        if (profile == null) {
+            return null;
+        }
+        try {
+            java.lang.reflect.Method method = profile.getClass().getMethod("getId");
+            Object result = method.invoke(profile);
+            if (result instanceof java.util.UUID uuid) {
+                return uuid;
+            }
+        } catch (Exception ignored) {
+            // ignore
+        }
+        try {
+            java.lang.reflect.Method method = profile.getClass().getMethod("getUuid");
+            Object result = method.invoke(profile);
+            if (result instanceof java.util.UUID uuid) {
+                return uuid;
+            }
+        } catch (Exception ignored) {
+            // ignore
+        }
+        try {
+            java.lang.reflect.Method method = profile.getClass().getMethod("getUUID");
+            Object result = method.invoke(profile);
+            if (result instanceof java.util.UUID uuid) {
+                return uuid;
+            }
+        } catch (Exception ignored) {
+            // ignore
+        }
+        return null;
+    }
+
 }
