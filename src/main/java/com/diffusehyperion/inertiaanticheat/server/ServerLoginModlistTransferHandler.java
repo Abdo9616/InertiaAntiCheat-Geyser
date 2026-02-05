@@ -77,6 +77,16 @@ public class ServerLoginModlistTransferHandler {
         LoginPacketSender sender = (LoginPacketSender) packetSender;
 
         if (!b) {
+            // Client doesn't respond to mod messages (likely Geyser/vanilla client)
+            boolean allowGeyserClients = InertiaAntiCheatServer.serverConfig.getBoolean("geyser.allow_geyser_clients", false);
+            
+            if (allowGeyserClients) {
+                debugInfo(handler.getConnectionInfo() + " does not respond to mod messages, but Geyser clients are allowed");
+                this.loginBlocker.complete(null);
+                debugLine();
+                return;
+            }
+            
             debugInfo(handler.getConnectionInfo() + " does not respond to mod messages, kicking now");
             handler.disconnect(Text.of(InertiaAntiCheatServer.serverConfig.getString("validation.vanillaKickMessage")));
             return;

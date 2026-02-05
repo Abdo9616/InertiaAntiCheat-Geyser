@@ -69,6 +69,10 @@ whitelist = ["Whitelisted mods: ", "None"]
 # Setting this to be an empty list will cause the icon to not show up.
 hash = ["Requires modpack: ", "Modpack Name"]
 
+[geyser]
+# Whether to allow Geyser clients (Bedrock players) to join the server.
+allow_geyser_clients = false
+
 [debug]
 # Show additional information in server logs.
 debug = false
