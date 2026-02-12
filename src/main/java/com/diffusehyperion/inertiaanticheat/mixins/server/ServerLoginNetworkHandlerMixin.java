@@ -15,6 +15,7 @@ public abstract class ServerLoginNetworkHandlerMixin implements UpgradedServerLo
     ClientConnection connection;
 
     @Shadow private @Nullable GameProfile profile;
+    @Shadow private @Nullable String profileName;
 
     @Override
     public ClientConnection inertiaAntiCheat$getConnection() {
@@ -24,5 +25,10 @@ public abstract class ServerLoginNetworkHandlerMixin implements UpgradedServerLo
     @Override
     public GameProfile inertiaAntiCheat$getGameProfile() {
         return this.profile;
+    }
+
+    @Override
+    public String inertiaAntiCheat$getProfileName() {
+        return this.profileName;
     }
 }

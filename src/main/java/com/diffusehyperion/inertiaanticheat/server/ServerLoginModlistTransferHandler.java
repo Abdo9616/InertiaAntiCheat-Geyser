@@ -61,6 +61,14 @@ public class ServerLoginModlistTransferHandler {
             transferHandler.loginBlocker.complete(null);
             return;
         }
+
+        String profileName = upgradedHandler.inertiaAntiCheat$getProfileName();
+        if (WhitelistedPlayers.isWhitelisted(profileName)) {
+            debugInfo("Whitelisted player, skipping the check: " + handler.getConnectionInfo() + " (" + profileName + ")");
+            debugLine();
+            transferHandler.loginBlocker.complete(null);
+            return;
+        }
         debugInfo("Not allowed to bypass, checking if address " + handler.getConnectionInfo() + " responds to mod messages");
 
         ServerLoginNetworking.registerReceiver(handler, InertiaAntiCheatConstants.CHECK_CONNECTION, transferHandler::checkConnection);
@@ -80,6 +88,15 @@ public class ServerLoginModlistTransferHandler {
         boolean allowGeyserClients = InertiaAntiCheatServer.serverConfig.getBoolean("geyser.allow_geyser_clients", false);
         UpgradedServerLoginNetworkHandler upgradedHandler = (UpgradedServerLoginNetworkHandler) handler;
         net.minecraft.network.ClientConnection connection = upgradedHandler.inertiaAntiCheat$getConnection();
+        String profileName = upgradedHandler.inertiaAntiCheat$getProfileName();
+
+        if (WhitelistedPlayers.isWhitelisted(profileName)) {
+            debugInfo("Whitelisted player, skipping the check: " + handler.getConnectionInfo() + " (" + profileName + ")");
+            this.loginBlocker.complete(null);
+            debugLine();
+            return;
+        }
+
         FloodgateBridge floodgateBridge = FloodgateBridge.get();
         com.mojang.authlib.GameProfile profile = upgradedHandler.inertiaAntiCheat$getGameProfile();
         java.util.UUID profileId = extractProfileId(profile);

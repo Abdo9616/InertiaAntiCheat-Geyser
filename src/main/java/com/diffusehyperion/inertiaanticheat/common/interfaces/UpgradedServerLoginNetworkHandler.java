@@ -6,4 +6,5 @@ import net.minecraft.network.ClientConnection;
 public interface UpgradedServerLoginNetworkHandler {
     ClientConnection inertiaAntiCheat$getConnection();
     GameProfile inertiaAntiCheat$getGameProfile();
+    String inertiaAntiCheat$getProfileName();
 }

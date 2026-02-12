@@ -26,6 +26,36 @@ Download the mod from [Modrinth](https://modrinth.com/mod/inertiaanticheat).
 
 Check [here](https://github.com/DiffuseHyperion/InertiaAntiCheat/wiki) for more details after downloading the mod.
 
+## Whitelisted Players
+
+The server creates `config/InertiaAntiCheat/whitelisted_players.json` on startup.
+
+Use it to allow specific usernames to join without installing the Inertia client mod:
+
+```json
+{
+  "enabled": true,
+  "players": [
+    "ExamplePlayer"
+  ]
+}
+```
+
+When enabled, matching usernames bypass the Inertia login check.
+
+## Geyser (Bedrock) Clients
+
+To allow Geyser/Floodgate Bedrock players to join without the Inertia client mod, enable:
+
+```toml
+[geyser]
+allow_geyser_clients = true
+```
+
+This setting lives in `config/InertiaAntiCheat/InertiaAntiCheat.toml`.
+
+Security note: enabling this increases your attack surface. Only use it if you trust your Geyser/Floodgate setup.
+
 ## Permissions
 
 You are free to use this in modpacks or wherever you like!

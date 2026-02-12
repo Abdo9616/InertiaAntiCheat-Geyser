@@ -78,6 +78,7 @@ public class InertiaAntiCheatServer implements DedicatedServerModInitializer {
             }
         }
 
+        WhitelistedPlayers.initialize();
         ServerLoginModlistTransferHandler.init();
     }
 
